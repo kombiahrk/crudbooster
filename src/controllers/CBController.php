@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Carbon;
 use Schema;
 
 class CBController extends Controller
@@ -58,6 +59,8 @@ class CBController extends Controller
     public $alert = [];
 
     public $index_button = [];
+    
+    public $button_date_filter = false;
 
     public $button_filter = true;
 
@@ -149,6 +152,7 @@ class CBController extends Controller
         $this->data['button_show'] = $this->button_show;
         $this->data['button_add'] = $this->button_add;
         $this->data['button_delete'] = $this->button_delete;
+        $this->data['button_date_filter']= $this->button_date_filter;
         $this->data['button_filter'] = $this->button_filter;
         $this->data['button_export'] = $this->button_export;
         $this->data['button_addmore'] = $this->button_addmore;
@@ -456,8 +460,22 @@ class CBController extends Controller
                 }
 
                 if ($type == 'between') {
-                    if ($key && $value) {
+                    if ($key && isset($value[0]) && isset($value[1])) {
+                        if (strpos($key, 'created_at')) {
+                            $value[0] =Carbon::parse($value[0]);
+                            $value[1] =Carbon::parse($value[1]);
+                        }
                         $result->whereBetween($key, $value);
+                        }elseif(isset($value[0]) && empty($value[1])){
+                        if (strpos($key, 'created_at')) {
+                            $value[0] = Carbon::parse($value[0]);
+                        }
+                        $result->where($key,'>=', $value[0]);
+                    }elseif(empty($value[0]) && isset($value[1])){
+                        if (strpos($key, 'created_at')) {
+                            $value[1] = Carbon::parse($value[1]);
+                        }
+                        $result->where($key,'<=', $value[1]);
                     }
                 } else {
                     continue;
