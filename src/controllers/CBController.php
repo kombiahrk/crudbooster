@@ -705,6 +705,8 @@ class CBController extends Controller
         $table = request('table');
         $where = request('where');
         $where = urldecode($where);
+        $orderby = request('order_by');
+        $orderby = urldecode($orderby);
         $columns = request('columns');
         $columns = explode(",", $columns);
         $paginate=request('paginate');
@@ -729,7 +731,12 @@ class CBController extends Controller
             $result->whereraw($where);
         }
 
-        $result->orderby($tablePK, 'desc');
+        if($orderby){
+            $orderby= explode(',',$orderby);
+            $result->orderby($orderby[0],$orderby[1]);
+        }else{
+            $result->orderby($tablePK, 'desc');
+        }
 
         $data['result'] = $result->paginate($paginate?:6);
         $data['columns'] = $columns;
