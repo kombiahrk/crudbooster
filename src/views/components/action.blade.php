@@ -42,7 +42,7 @@
     if (isset($confirmation) && ! empty($confirmation)) {
         $url = "javascript:;";
     }
-    if(isset($extra){
+    if(isset($extra)){
         foreach ($row as $key => $val) {
             $extra= str_replace("[".$key."]", '"'.$val.'"', $extra);
         }
